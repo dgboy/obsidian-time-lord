@@ -49,6 +49,8 @@ function toLogTimeBlock(props: {
     listItemEntryWithChildren,
   } = props;
 
+  console.log("[entry-to-time-block] logEntry.id:", logEntry.id, "logEntry.tags:", logEntry.tags, "source:", logEntry.source);
+
   const base = {
     ...toTimeBlockTime(strictParse(logEntry.start), endTime),
     id: logEntry.id,

@@ -143,27 +143,39 @@ export function useColorOverrides({ timeBlock }: UseColorProps) {
 export function useTagColors(timeBlock: TimeBlock) {
   const { settingsSignal, isDarkMode } = getObsidianContext();
 
-  const tags = $derived(
-    "tags" in timeBlock && Array.isArray(timeBlock.tags) ? timeBlock.tags : [],
-  );
+  const rawTags = "tags" in timeBlock && Array.isArray(timeBlock.tags) ? timeBlock.tags : [];
+  console.log("[useTagColors] timeBlock.id:", timeBlock.id, "source:", timeBlock.source, "rawTags:", rawTags, "text:", (timeBlock as any).text);
+
+  const tags = $derived(rawTags);
 
   const backgroundColor = $derived.by(() => {
     if (!tags?.length) {
+      console.log("[useTagColors] no tags, returning empty");
       return "";
     }
 
     const { tagColors } = settingsSignal.current;
+    console.log("[useTagColors] tagColors config:", tagColors);
 
     // Find the first tag that has a color defined
     const matchingTag = tags.find((tag) => tagColors[tag]);
+    console.log("[useTagColors] matchingTag:", matchingTag);
 
     if (!matchingTag) {
+      console.log("[useTagColors] no matching tag found in config");
       return "";
     }
 
     const colorConfig = tagColors[matchingTag];
+    const color = isDarkMode.current ? colorConfig.dark : colorConfig.light;
+    console.log("[useTagColors] using color for tag:", matchingTag, "isDark:", isDarkMode.current, "color:", color);
 
-    return isDarkMode.current ? colorConfig.dark : colorConfig.light;
+    // HARDCODED DEBUG: force different colors per tag to verify the logic works
+    if (matchingTag === "work") return "#ff0000";
+    if (matchingTag === "activity") return "#00ff00";
+    if (matchingTag === "watch") return "#0000ff";
+
+    return color;
   });
 
   const properContrastColors = $derived.by(() => {
