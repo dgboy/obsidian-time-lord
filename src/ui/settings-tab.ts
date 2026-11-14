@@ -745,60 +745,101 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           }),
       );
 
-    // Tag Colors settings
-    const tagColorsGroup = new SettingGroup(containerEl)
-      .setHeading("Tag Colors")
-      .addSetting((setting) =>
-        setting
-          .setName("Enable Tag Colors")
-          .setDesc(
-            "Color time blocks based on tags in the log entry. The first tag with a configured color is used.",
-          )
-          .addToggle((component) => {
-            component
-              .setValue(true)
-              .onChange((value) => {
-                // Placeholder - tag colors are always enabled when tags are present
-              });
+    // Folder Colors settings
+    new SettingGroup(containerEl)
+      .setHeading("Folder Colors")
+      .addExtraButton((button) =>
+        button
+          .setIcon("plus")
+          .setTooltip("Add folder color rule")
+          .onClick(() => {
+            const newRule = {
+              folder: "",
+              light: "#ffffff",
+              dark: "#000000",
+            };
+
+            this.settingsStore.update((previous) => ({
+              ...previous,
+              folderColors: [...previous.folderColors, newRule],
+            }));
+
+            this.display();
           }),
       );
 
-    Object.entries(this.plugin.getSettings().tagColors).forEach(
-      ([tag, colors], index) => {
-        new SettingGroup(containerEl)
-          .setHeading(`#${tag.replace("#", "")}`)
-          .addSetting((setting) =>
-            setting
-              .setName("Light mode color")
-              .addColorPicker((el) =>
-                el.setValue(colors.light).onChange((value: string) => {
-                  this.settingsStore.update(
-                    produce((draft) => {
-                      const current = draft.tagColors[tag];
-                      isNotVoid(current);
-                      current.light = value;
-                    }),
-                  );
+    this.plugin.getSettings().folderColors.forEach((rule, index) => {
+      new SettingGroup(containerEl)
+        .setHeading(`Rule ${index + 1}`)
+        .addSetting((setting) =>
+          setting
+            .setName("Folder path")
+            .setDesc("Full folder path in the vault, e.g. 'notebooks/daily'")
+            .addText((el) =>
+              el
+                .setPlaceholder("notebooks/daily")
+                .setValue(rule.folder)
+                .onChange((value: string) => {
+                  this.settingsStore.update((previous) => ({
+                    ...previous,
+                    folderColors: previous.folderColors.map(
+                      (editedRule, editedIndex) =>
+                        editedIndex === index
+                          ? { ...editedRule, folder: value }
+                          : editedRule,
+                    ),
+                  }));
                 }),
-              ),
-          )
-          .addSetting((setting) =>
-            setting
-              .setName("Dark mode color")
-              .addColorPicker((el) =>
-                el.setValue(colors.dark).onChange((value: string) => {
-                  this.settingsStore.update(
-                    produce((draft) => {
-                      const current = draft.tagColors[tag];
-                      isNotVoid(current);
-                      current.dark = value;
-                    }),
-                  );
-                }),
-              ),
-          );
-      },
-    );
+            ),
+        )
+        .addSetting((setting) =>
+          setting
+            .setName("Light mode color")
+            .addColorPicker((el) =>
+              el.setValue(rule.light).onChange((value: string) => {
+                this.settingsStore.update(
+                  produce((draft) => {
+                    const current = draft.folderColors[index];
+                    isNotVoid(current);
+                    current.light = value;
+                  }),
+                );
+              }),
+            ),
+        )
+        .addSetting((setting) =>
+          setting
+            .setName("Dark mode color")
+            .addColorPicker((el) =>
+              el.setValue(rule.dark).onChange((value: string) => {
+                this.settingsStore.update(
+                  produce((draft) => {
+                    const current = draft.folderColors[index];
+                    isNotVoid(current);
+                    current.dark = value;
+                  }),
+                );
+              }),
+            ),
+        )
+        .addSetting((setting) =>
+          setting.addExtraButton((el) =>
+            el
+              .setIcon("trash")
+              .setTooltip("Delete folder color rule")
+              .onClick(() => {
+                this.settingsStore.update((previous) => ({
+                  ...previous,
+                  folderColors: previous.folderColors.filter(
+                    (editedRule, editedIndex) => editedIndex !== index,
+                  ),
+                }));
+
+                this.display();
+              }),
+          ),
+        );
+    });
   }
 
   private update(patch: Partial<DayPlannerSettings>) {

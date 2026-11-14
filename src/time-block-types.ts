@@ -40,7 +40,6 @@ interface LocalTimeBlockBase extends ListItemTokens, BaseTimeBlock {
   text: string;
   children?: Array<ListItemEntryWithChildren>;
   durationMinutes: number;
-  tags?: string[];
 }
 
 /**

@@ -56,7 +56,6 @@ function toLogTimeBlock(props: {
     isRunning,
     children: listItemEntryWithChildren?.children,
     path: parentEntry.path,
-    tags: logEntry.tags,
   };
 
   if (isListItemEntry(parentEntry)) {

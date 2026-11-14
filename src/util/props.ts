@@ -30,7 +30,6 @@ const logEntrySchema = z.object({
 export type LogEntry = z.infer<typeof logEntrySchema>;
 
 const plannerSchema = z.object({
-  tags: z.array(z.string()).optional(),
   log: z.array(logEntrySchema).optional(),
 });
 

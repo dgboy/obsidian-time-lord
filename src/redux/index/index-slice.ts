@@ -41,7 +41,6 @@ export interface LogEntry {
   end?: string;
   dayKeys: string[];
   source: "listItemLog" | "frontmatterLog";
-  tags?: string[];
 }
 
 // todo: add RunningLogEntry

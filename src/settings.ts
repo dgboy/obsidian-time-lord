@@ -56,7 +56,7 @@ export interface DayPlannerSettings {
   showSubtasksInTaskBlocks: boolean;
   icals: Array<IcalConfig>;
   colorOverrides: Array<ColorOverride>;
-  tagColors: Record<string, { light: string; dark: string }>;
+  folderColors: Array<{ folder: string; light: string; dark: string }>;
   releaseNotes: boolean;
   taskStatusOnCreation: string;
   eventFormatOnCreation: (typeof eventFormats)[number];
@@ -95,11 +95,7 @@ export const defaultSettings: DayPlannerSettings = {
   showSubtasksInTaskBlocks: true,
   icals: [],
   colorOverrides: [],
-  tagColors: {
-    work: { light: "#d4e1f7", dark: "#1e3a5f" },
-    activity: { light: "#d5f5e3", dark: "#1e5639" },
-    watch: { light: "#fcf3cf", dark: "#7d6608" },
-  },
+  folderColors: [],
   releaseNotes: true,
   taskStatusOnCreation: " ",
   eventFormatOnCreation: "task",

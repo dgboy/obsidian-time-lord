@@ -140,32 +140,50 @@ export function useColorOverrides({ timeBlock }: UseColorProps) {
   };
 }
 
-export function useTagColors(timeBlock: TimeBlock) {
+export function useFolderColors(timeBlock: TimeBlock) {
   const { settingsSignal, isDarkMode } = getObsidianContext();
 
-  const tags = $derived.by(() => {
-    return "tags" in timeBlock && Array.isArray(timeBlock.tags) ? timeBlock.tags : [];
+  const folderPath = $derived.by(() => {
+    if ("path" in timeBlock && typeof timeBlock.path === "string") {
+      // Extract folder from full path: "vault/notebooks/daily.md" -> "notebooks"
+      const parts = timeBlock.path.split("/");
+      parts.pop(); // remove filename
+      return parts.join("/");
+    }
+    return "";
   });
 
   const backgroundColor = $derived.by(() => {
-    const blockTags = tags;
+    const path = folderPath;
+    console.log("[useFolderColors] timeBlock.id:", timeBlock.id, "source:", timeBlock.source, "fullPath:", timeBlock.path, "folderPath:", path);
 
-    if (!blockTags?.length) {
+    if (!path) {
+      console.log("[useFolderColors] no folder path, returning empty");
       return "";
     }
 
-    const { tagColors } = settingsSignal.current;
+    const { folderColors } = settingsSignal.current;
+    console.log("[useFolderColors] folderColors rules:", folderColors);
 
-    // Find the first tag that has a color defined
-    const matchingTag = blockTags.find((tag) => tagColors[tag]);
+    // Find the first folder rule that matches (longest prefix match)
+    const matchingRules = folderColors.filter(
+      (rule) => path === rule.folder || path.startsWith(rule.folder + "/"),
+    );
+    console.log("[useFolderColors] matching rules:", matchingRules);
 
-    if (!matchingTag) {
+    const matchingRule = matchingRules.sort(
+      (a, b) => b.folder.length - a.folder.length,
+    )[0];
+
+    if (!matchingRule) {
+      console.log("[useFolderColors] no matching rule, returning empty");
       return "";
     }
 
-    const colorConfig = tagColors[matchingTag];
+    const color = isDarkMode.current ? matchingRule.dark : matchingRule.light;
+    console.log("[useFolderColors] matched rule:", matchingRule.folder, "isDark:", isDarkMode.current, "color:", color);
 
-    return isDarkMode.current ? colorConfig.dark : colorConfig.light;
+    return color;
   });
 
   const properContrastColors = $derived.by(() => {

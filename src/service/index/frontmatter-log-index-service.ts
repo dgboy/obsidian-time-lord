@@ -35,13 +35,10 @@ export class FrontmatterLogIndexService implements IndexService {
 
     const fileEntryId = createFileEntryId(path);
 
-    const plannerTags = parsed.planner?.tags;
-
     const logEntries = log.map(({ start, end }, index) =>
       createLogEntry({
         start,
         end,
-        tags: plannerTags,
         parentId: fileEntryId,
         id: createId(fileEntryId, index),
         source: "frontmatterLog",

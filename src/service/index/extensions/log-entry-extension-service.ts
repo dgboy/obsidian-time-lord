@@ -25,10 +25,6 @@ export class LogEntryExtensionService implements ListItemIndexExtensionService {
         listItemText,
       );
 
-      const plannerTags = listItemProps?.parsed.planner?.tags;
-
-      // todo: cut out props here, use removeWithin(text: string, outer: Pos, inner: Pos)
-
       return {
         propsPosition: listItemProps?.position,
         logEntries:
@@ -36,7 +32,6 @@ export class LogEntryExtensionService implements ListItemIndexExtensionService {
             createLogEntry({
               start,
               end,
-              tags: plannerTags,
               parentId: rawListItemEntry.id,
               id: createId(rawListItemEntry.id, index),
               source: "listItemLog",

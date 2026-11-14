@@ -2,7 +2,7 @@
   import { type Snippet } from "svelte";
 
   import type { TimeBlock } from "../../time-block-types";
-  import { useColorOverrides, useTagColors } from "../hooks/use-color.svelte";
+  import { useColorOverrides, useFolderColors } from "../hooks/use-color.svelte";
 
   interface Props {
     children: Snippet;
@@ -19,16 +19,18 @@
     ...rest
   }: Props = $props();
 
-  const tagColors = $derived(useTagColors(timeBlock));
-  const colorOverrides = $derived(useColorOverrides({ timeBlock }));
+  // Priority: color overrides > folder colors
+  const colorOverrides = useColorOverrides({ timeBlock });
+  const folderColors = useFolderColors(timeBlock);
 
-  // Tag colors have highest priority, then color overrides
   const backgroundColor = $derived(
-    tagColors.backgroundColor || colorOverrides.backgroundColor,
+    colorOverrides.backgroundColor || folderColors.backgroundColor,
   );
 
+  console.log("[time-block-base] id:", timeBlock.id, "source:", timeBlock.source, "path:", (timeBlock as any).path, "colorOverrides.bg:", colorOverrides.backgroundColor, "folderColors.bg:", folderColors.backgroundColor, "finalBg:", backgroundColor);
+
   const contrastColors = $derived.by(() => {
-    return tagColors.properContrastColors || colorOverrides.properContrastColors;
+    return colorOverrides.properContrastColors || folderColors.properContrastColors;
   });
 </script>
 
