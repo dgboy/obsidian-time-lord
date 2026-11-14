@@ -744,6 +744,61 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
               });
           }),
       );
+
+    // Tag Colors settings
+    const tagColorsGroup = new SettingGroup(containerEl)
+      .setHeading("Tag Colors")
+      .addSetting((setting) =>
+        setting
+          .setName("Enable Tag Colors")
+          .setDesc(
+            "Color time blocks based on tags in the log entry. The first tag with a configured color is used.",
+          )
+          .addToggle((component) => {
+            component
+              .setValue(true)
+              .onChange((value) => {
+                // Placeholder - tag colors are always enabled when tags are present
+              });
+          }),
+      );
+
+    Object.entries(this.plugin.getSettings().tagColors).forEach(
+      ([tag, colors], index) => {
+        new SettingGroup(containerEl)
+          .setHeading(`#${tag.replace("#", "")}`)
+          .addSetting((setting) =>
+            setting
+              .setName("Light mode color")
+              .addColorPicker((el) =>
+                el.setValue(colors.light).onChange((value: string) => {
+                  this.settingsStore.update(
+                    produce((draft) => {
+                      const current = draft.tagColors[tag];
+                      isNotVoid(current);
+                      current.light = value;
+                    }),
+                  );
+                }),
+              ),
+          )
+          .addSetting((setting) =>
+            setting
+              .setName("Dark mode color")
+              .addColorPicker((el) =>
+                el.setValue(colors.dark).onChange((value: string) => {
+                  this.settingsStore.update(
+                    produce((draft) => {
+                      const current = draft.tagColors[tag];
+                      isNotVoid(current);
+                      current.dark = value;
+                    }),
+                  );
+                }),
+              ),
+          );
+      },
+    );
   }
 
   private update(patch: Partial<DayPlannerSettings>) {

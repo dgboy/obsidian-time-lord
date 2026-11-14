@@ -2,7 +2,7 @@
   import { type Snippet } from "svelte";
 
   import type { TimeBlock } from "../../time-block-types";
-  import { useColorOverrides } from "../hooks/use-color.svelte";
+  import { useColorOverrides, useTagColors } from "../hooks/use-color.svelte";
 
   interface Props {
     children: Snippet;
@@ -19,17 +19,24 @@
     ...rest
   }: Props = $props();
 
-  const {
-    properContrastColors: { normal, muted, faint },
-    backgroundColor,
-  } = $derived(useColorOverrides({ timeBlock }));
+  const tagColors = $derived(useTagColors(timeBlock));
+  const colorOverrides = $derived(useColorOverrides({ timeBlock }));
+
+  // Tag colors have highest priority, then color overrides
+  const backgroundColor = $derived(
+    tagColors.backgroundColor || colorOverrides.backgroundColor,
+  );
+
+  const contrastColors = $derived.by(() => {
+    return tagColors.properContrastColors || colorOverrides.properContrastColors;
+  });
 </script>
 
 <div class="padding">
   <div
-    style:--text-faint={faint}
-    style:--text-muted={muted}
-    style:--text-normal={normal}
+    style:--text-faint={contrastColors.faint}
+    style:--text-muted={contrastColors.muted}
+    style:--text-normal={contrastColors.normal}
     style:--time-block-bg-color={backgroundColor}
     class={[
       "content",

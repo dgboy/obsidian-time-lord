@@ -30,10 +30,11 @@ export class LogEntryExtensionService implements ListItemIndexExtensionService {
       return {
         propsPosition: listItemProps?.position,
         logEntries:
-          listItemProps?.parsed.planner?.log?.map(({ start, end }, index) =>
+          listItemProps?.parsed.planner?.log?.map(({ start, end, tags }, index) =>
             createLogEntry({
               start,
               end,
+              tags,
               parentId: rawListItemEntry.id,
               id: createId(rawListItemEntry.id, index),
               source: "listItemLog",

@@ -3,11 +3,12 @@ import { getDayKeysInRange, strictParse } from "../../util/moment";
 export function createLogEntry(props: {
   start: string;
   end?: string;
+  tags?: string[];
   parentId: string;
   id: string;
   source: "listItemLog" | "frontmatterLog";
 }) {
-  const { start, end, parentId, id, source } = props;
+  const { start, end, tags, parentId, id, source } = props;
 
   const parsedStart = strictParse(start);
 
@@ -15,11 +16,11 @@ export function createLogEntry(props: {
     ? strictParse(end)
     : // TODO: P3 bug
       //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
-      //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveLogTimeBlocks selector
+      //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveLogTimeBlock selector
       //  Solution 3: use sorted array instead of buckets
       window.moment();
 
   const dayKeys: string[] = getDayKeysInRange(parsedStart, parsedEnd);
 
-  return { start, end, parentId, dayKeys, id, source };
+  return { start, end, tags, parentId, dayKeys, id, source };
 }

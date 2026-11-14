@@ -73,6 +73,7 @@ export interface ListItemLogTimeBlock
   extends ListItemSourcedTimeBlockBase,
     WithRunningState {
   source: "listItemLog";
+  tags?: string[];
 }
 
 export interface FrontmatterLogTimeBlock
@@ -84,6 +85,7 @@ export interface FrontmatterLogTimeBlock
    * have a path, but no position.
    */
   path: string;
+  tags?: string[];
 }
 
 /**

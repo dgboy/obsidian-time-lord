@@ -139,3 +139,49 @@ export function useColorOverrides({ timeBlock }: UseColorProps) {
     },
   };
 }
+
+export function useTagColors(timeBlock: TimeBlock) {
+  const { settingsSignal, isDarkMode } = getObsidianContext();
+
+  const tags = $derived(
+    "tags" in timeBlock && Array.isArray(timeBlock.tags) ? timeBlock.tags : [],
+  );
+
+  const backgroundColor = $derived.by(() => {
+    if (!tags?.length) {
+      return "";
+    }
+
+    const { tagColors } = settingsSignal.current;
+
+    // Find the first tag that has a color defined
+    const matchingTag = tags.find((tag) => tagColors[tag]);
+
+    if (!matchingTag) {
+      return "";
+    }
+
+    const colorConfig = tagColors[matchingTag];
+
+    return isDarkMode.current ? colorConfig.dark : colorConfig.light;
+  });
+
+  const properContrastColors = $derived.by(() => {
+    return backgroundColor
+      ? getTextColorWithEnoughContrast(backgroundColor as import("obsidian").HexString)
+      : {
+          normal: "inherit",
+          muted: "inherit",
+          faint: "inherit",
+        };
+  });
+
+  return {
+    get properContrastColors() {
+      return properContrastColors;
+    },
+    get backgroundColor() {
+      return backgroundColor;
+    },
+  };
+}
