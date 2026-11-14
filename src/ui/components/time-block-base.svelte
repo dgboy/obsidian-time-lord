@@ -27,8 +27,6 @@
     tagColors.backgroundColor || colorOverrides.backgroundColor,
   );
 
-  console.log("[time-block-base] id:", timeBlock.id, "source:", timeBlock.source, "tags:", (timeBlock as any).tags, "backgroundColor:", backgroundColor);
-
   const contrastColors = $derived.by(() => {
     return tagColors.properContrastColors || colorOverrides.properContrastColors;
   });

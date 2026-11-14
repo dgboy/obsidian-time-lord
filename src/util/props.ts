@@ -25,12 +25,12 @@ const dateTimeSchema = z.string().refine((it) => strictParse(it).isValid());
 const logEntrySchema = z.object({
   start: dateTimeSchema,
   end: dateTimeSchema.optional(),
-  tags: z.array(z.string()).optional(),
 });
 
 export type LogEntry = z.infer<typeof logEntrySchema>;
 
 const plannerSchema = z.object({
+  tags: z.array(z.string()).optional(),
   log: z.array(logEntrySchema).optional(),
 });
 
